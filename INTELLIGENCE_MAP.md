@@ -18,7 +18,8 @@ Responsibilities:
 - collect user video input
 - collect shot preferences and constraints
 - call backend endpoints
-- display backend responses
+- display structured shot analysis results from backend responses
+- display backend health and chat responses
 - show provider/connectivity state
 
 Important files:
@@ -74,6 +75,7 @@ Responsibilities:
 4. Backend generates placeholder metrics.
 5. Rules engine derives up to 3 fixes plus notes.
 6. Backend returns the response and removes the temp file.
+7. Frontend presents the existing response as metric cards, top fixes, notes, and a placeholder disclaimer.
 
 ### Chat Flow
 
@@ -90,4 +92,5 @@ Current authority boundaries must stay clear:
 - rules engine may interpret metrics but must not invent new ones
 - chat may explain and coach, but should not become a hidden scoring engine
 - frontend is a presentation and input layer, not a source of decision truth
+- frontend can format status labels for readability, but backend analysis remains the data source
 - continuity docs describe system state but do not override code reality

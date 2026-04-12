@@ -11,19 +11,18 @@ AI Jumpshot Coach is a desktop-first basketball shot analysis MVP. The current p
 ## Current Milestone
 
 ### Milestone
-M1: Stable MVP scaffold with preference-aware coaching flow
+M2: Analysis UI transformation
 
 ### Objective
-Keep the app as a small, verifiable vertical slice that proves the desktop upload -> analyze -> coach-chat loop.
+Replace raw JSON analysis display with a structured, user-friendly results UI while preserving backend behavior.
 
 ### In Scope
-- local FastAPI backend
-- desktop Electron + React frontend
-- upload and analyze flow
-- preference capture
-- coaching chat grounded in latest analysis
-- Ollama integration as optional enhancement with safe fallback
-- continuity-doc discipline for future phases
+- frontend-only presentation changes
+- metric cards for `knee_bend_depth` and `drift`
+- simple status labels and short coaching text
+- top fixes from the existing backend response
+- persistent placeholder analysis disclaimer
+- continuity-doc updates after implementation
 
 ### Out Of Scope
 - backend expansion beyond the current local MVP
@@ -31,6 +30,7 @@ Keep the app as a small, verifiable vertical slice that proves the desktop uploa
 - hidden scoring or ranking systems
 - ML-based shot evaluation
 - autonomous recommendation loops
+- analysis logic changes
 - authority shifts where support layers become decision layers
 - speculative intelligence layers not backed by implemented behavior
 
@@ -72,10 +72,10 @@ These checkpoints should be surfaced proactively, not only when requested.
 ## Next Milestone Candidates
 
 Priority should stay on small MVP-strengthening slices. Good next steps would be:
-- improve analysis output presentation so results are easier to understand than raw JSON
 - tighten API contracts and add lightweight backend tests
 - make coaching responses more structured while still grounded in available analysis
 - improve local run ergonomics and setup clarity
+- refine the visual design of the results UI after manual review
 
 ## Milestone Framing Template
 

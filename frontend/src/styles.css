@@ -106,9 +106,144 @@ button.primary {
   color: #9fb0c0;
 }
 
+.compact {
+  margin-top: 4px;
+}
+
 .error {
   margin-top: 12px;
   color: #ff8b8b;
+}
+
+.emptyState p {
+  color: #9fb0c0;
+}
+
+.sectionTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sectionTitleRow h2 {
+  margin-bottom: 0;
+}
+
+.disclaimer {
+  margin-top: 14px;
+  border: 1px solid #854d0e;
+  border-radius: 10px;
+  background: #422006;
+  color: #fde68a;
+  padding: 12px;
+  line-height: 1.45;
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.metricCard {
+  border: 1px solid #2a3a52;
+  border-radius: 12px;
+  background: #0b0f14;
+  padding: 14px;
+}
+
+.metricCardHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.metricCard h3,
+.topFixes h3,
+.analysisNotes h3 {
+  margin: 0;
+}
+
+.metricValue {
+  margin-top: 12px;
+  font-size: 36px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.metricCard p {
+  color: #d6e0ea;
+  line-height: 1.5;
+}
+
+.metricMeta {
+  color: #9fb0c0;
+  font-size: 12px;
+}
+
+.metricStatus {
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.metricStatus.good {
+  color: #86efac;
+  background: #052e16;
+  border: 1px solid #166534;
+}
+
+.metricStatus.warning {
+  color: #fde68a;
+  background: #422006;
+  border: 1px solid #854d0e;
+}
+
+.metricStatus.needs-work {
+  color: #fecaca;
+  background: #450a0a;
+  border: 1px solid #7f1d1d;
+}
+
+.topFixes,
+.analysisNotes {
+  margin-top: 18px;
+}
+
+.fixList {
+  display: grid;
+  gap: 12px;
+  padding-left: 24px;
+}
+
+.fixList li {
+  padding-left: 4px;
+}
+
+.fixList strong,
+.fixList span,
+.fixList small {
+  display: block;
+}
+
+.fixList span {
+  margin-top: 4px;
+  color: #d6e0ea;
+}
+
+.fixList small {
+  margin-top: 4px;
+  color: #9fb0c0;
+}
+
+.analysisNotes ul {
+  padding-left: 20px;
+  color: #d6e0ea;
 }
 
 pre {
@@ -125,5 +260,13 @@ pre {
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .metricGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionTitleRow {
+    flex-direction: column;
   }
 }

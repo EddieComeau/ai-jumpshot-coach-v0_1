@@ -8,6 +8,133 @@ function splitCsv(input) {
     .filter(Boolean);
 }
 
+const METRIC_COPY = {
+  knee_bend_depth: {
+    label: "Knee Bend Depth",
+    getStatus(metric) {
+      if (metric.value < 45) return "needs work";
+      if (metric.value < 55) return "warning";
+      return "good";
+    },
+    getCoachingText(metric) {
+      if (metric.value < 45) return "Your dip is reading shallow. Think smooth hip load before rising into the shot.";
+      if (metric.value < 55) return "Your load is close. Keep the dip controlled and repeatable.";
+      return "Your lower-body load is in a stronger range for this early-stage read.";
+    },
+  },
+  drift: {
+    label: "Forward Drift",
+    getStatus(metric) {
+      if (metric.value > 0.18) return "needs work";
+      if (metric.value > 0.12) return "warning";
+      return "good";
+    },
+    getCoachingText(metric) {
+      if (metric.value > 0.18) return "You are drifting forward. Focus on going up through the shot instead of out.";
+      if (metric.value > 0.12) return "Your drift is worth watching. Keep your finish tall and balanced.";
+      return "Your forward movement looks controlled in this early-stage read.";
+    },
+  },
+};
+
+function formatMetricPercent(metric) {
+  const value = metric.name === "drift" ? metric.value * 100 : metric.value;
+  return `${Math.round(value)}%`;
+}
+
+function getMetricUi(metric) {
+  const config = METRIC_COPY[metric.name] || {
+    label: metric.name,
+    getStatus: () => "warning",
+    getCoachingText: () => "Review this metric as an early-stage signal, not a final diagnosis.",
+  };
+
+  return {
+    label: config.label,
+    value: formatMetricPercent(metric),
+    status: config.getStatus(metric),
+    coachingText: config.getCoachingText(metric),
+  };
+}
+
+function ShotAnalysisResults({ analysis }) {
+  const trackedMetrics = ["knee_bend_depth", "drift"]
+    .map((name) => analysis?.metrics?.find((metric) => metric.name === name))
+    .filter(Boolean);
+
+  if (!analysis) {
+    return (
+      <div className="emptyState">
+        <h2>Shot Analysis</h2>
+        <p>Upload a clip and click Analyze to see your early-stage shot readout.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="analysisResults">
+      <div className="sectionTitleRow">
+        <div>
+          <h2>Shot Analysis</h2>
+          <p className="muted compact">Results for {analysis.video_filename || "uploaded clip"}</p>
+        </div>
+        <span className="statusPill off">Placeholder analysis</span>
+      </div>
+
+      <div className="disclaimer">
+        Early-stage placeholder analysis: these metrics are fixed MVP signals, not validated pose tracking or real biomechanics yet.
+      </div>
+
+      <div className="metricGrid">
+        {trackedMetrics.map((metric) => {
+          const ui = getMetricUi(metric);
+          return (
+            <article className="metricCard" key={metric.name}>
+              <div className="metricCardHeader">
+                <h3>{ui.label}</h3>
+                <span className={`metricStatus ${ui.status.replaceAll(" ", "-")}`}>{ui.status}</span>
+              </div>
+              <div className="metricValue">{ui.value}</div>
+              <p>{ui.coachingText}</p>
+              <div className="metricMeta">
+                Confidence: {Math.round((metric.confidence || 0) * 100)}% | Source: placeholder
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="topFixes">
+        <h3>Top Fixes</h3>
+        {analysis.fixes?.length ? (
+          <ol className="fixList">
+            {analysis.fixes.map((fix, index) => (
+              <li key={`${fix.issue}-${index}`}>
+                <strong>{fix.issue}</strong>
+                <span>{fix.cue}</span>
+                <small>{fix.drill}</small>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="muted">No fixes returned for this clip.</p>
+        )}
+      </div>
+
+      {analysis.notes?.length ? (
+        <div className="analysisNotes">
+          <h3>Coach Notes</h3>
+          <ul>
+            {analysis.notes.map((note, index) => (
+              <li key={`${note}-${index}`}>{note}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [healthRes, setHealthRes] = useState(null);
@@ -134,8 +261,7 @@ export default function App() {
         </div>
 
         <div className="card">
-          <h2>Analysis</h2>
-          <pre>{analysis ? JSON.stringify(analysis, null, 2) : "Upload a clip and click Analyze."}</pre>
+          <ShotAnalysisResults analysis={analysis} />
         </div>
       </section>
 

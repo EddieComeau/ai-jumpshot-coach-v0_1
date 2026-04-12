@@ -15,7 +15,7 @@ The desktop UI lets you:
 - run analysis
 - enter player preferences and constraints
 - send analysis-grounded coaching prompts
-- inspect raw backend JSON responses
+- review structured shot analysis results, top fixes, and coaching notes
 
 ## Local Run
 
@@ -76,6 +76,8 @@ Use `GET /chat/status` to confirm provider state and Ollama connectivity.
 - up to 3 rules-engine fixes
 - notes
 - debug metadata
+
+The frontend presents the analysis as user-friendly cards and lists while keeping the placeholder status visible.
 
 This is intentionally a lightweight MVP. Real pose extraction is not enabled yet.
 
