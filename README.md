@@ -131,6 +131,28 @@ bash run.sh
 4. If Ollama is unavailable, send a chat message and verify the rules fallback response still renders without crashing.
 5. Expected: mesh mode works with either Ollama output or fallback output, and `/chat/status` reflects the current connection state.
 
+## Smoke Test Results
+
+Latest verification: April 13, 2026
+
+Runtime notes:
+- Backend dependency environment was recreated with `python3 -m venv .venv` and `pip install -r requirements.txt`.
+- Backend loopback server tests required local port access in the sandbox.
+- Electron launch required unsetting `ELECTRON_RUN_AS_NODE` in this shell: `env -u ELECTRON_RUN_AS_NODE npm run dev`.
+- No application code fixes were needed.
+
+Results:
+- PASS: No Analysis Chat. `CHAT_PROVIDER=rules` returned a coaching response without `last_analysis`.
+- PASS: Analysis Flow. `POST /analyze` accepted a smoke-test upload and returned `knee_bend_depth`, `drift`, fixes, notes, and placeholder debug state.
+- PASS: Chat With Analysis. `POST /chat` accepted `last_analysis` and returned analysis-aware fallback text.
+- PASS: Preferences Applied. `POST /chat` accepted preferences and returned preference-aware lines including shot style, locked mechanics, focus area, physical constraint, and environment context.
+- PASS: Rules Mode. `/chat/status` reported `provider: rules`, and chat worked without Ollama.
+- PASS: Mesh Mode fallback. `/chat/status` reported `provider: mesh`; Ollama was unavailable locally, and chat returned the local fallback without crashing.
+- SKIPPED: Live Ollama response. Ollama was not running at `http://127.0.0.1:11434`, so only mesh fallback was verified.
+- PASS: Frontend dev server launch. Vite served the app at `http://127.0.0.1:5173/`.
+- PASS: Electron dev app launch. `npm run dev` launched after unsetting `ELECTRON_RUN_AS_NODE`.
+- PASS: Frontend production build. `cd frontend && npm run build` completed successfully.
+
 ## Current Analysis Behavior
 
 `/analyze` currently returns:
