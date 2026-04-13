@@ -246,6 +246,76 @@ button.primary {
   color: #d6e0ea;
 }
 
+.chatResponsePanel {
+  margin-top: 14px;
+  border: 1px solid #223044;
+  border-radius: 12px;
+  background: #0b0f14;
+  padding: 14px;
+}
+
+.chatContextRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.contextChip {
+  display: inline-block;
+  border: 1px solid #1d4ed8;
+  border-radius: 999px;
+  background: #172554;
+  color: #bfdbfe;
+  font-size: 12px;
+  padding: 5px 9px;
+}
+
+.mutedChip {
+  border-color: #2a3a52;
+  background: #121826;
+  color: #9fb0c0;
+}
+
+.chatSections {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.chatSection {
+  border: 1px solid #223044;
+  border-radius: 10px;
+  background: #121826;
+  padding: 12px;
+}
+
+.chatSection h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #9fb0c0;
+}
+
+.chatSection p {
+  margin: 8px 0 0;
+  color: #e6edf3;
+  line-height: 1.55;
+}
+
+.chatSection p:first-of-type {
+  margin-top: 0;
+}
+
+.chatDisclaimer {
+  margin-top: 14px;
+  border-top: 1px solid #223044;
+  padding-top: 12px;
+  color: #9fb0c0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 pre {
   white-space: pre-wrap;
   word-break: break-word;

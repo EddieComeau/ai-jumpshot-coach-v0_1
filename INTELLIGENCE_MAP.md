@@ -19,7 +19,8 @@ Responsibilities:
 - collect shot preferences and constraints
 - call backend endpoints
 - display structured shot analysis results from backend responses
-- display backend health and chat responses
+- display structured chat response sections without changing backend wording
+- display backend health responses
 - show provider/connectivity state
 
 Important files:
@@ -84,6 +85,7 @@ Responsibilities:
 3. Backend assembles grounded fallback context.
 4. If provider mode allows, backend attempts Ollama generation.
 5. If Ollama fails or is disabled, backend returns local fallback coaching text.
+6. Frontend presents the returned chat text as readable sections with analysis/preference context indicators and a limited-analysis disclaimer.
 
 ## Authority Boundaries
 
@@ -93,4 +95,5 @@ Current authority boundaries must stay clear:
 - chat may explain and coach, but should not become a hidden scoring engine
 - frontend is a presentation and input layer, not a source of decision truth
 - frontend can format status labels for readability, but backend analysis remains the data source
+- frontend can group chat text for readability, but must preserve backend response wording and meaning
 - continuity docs describe system state but do not override code reality

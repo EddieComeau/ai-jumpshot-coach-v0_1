@@ -14,7 +14,7 @@ The desktop UI lets you:
 - upload a video file
 - run analysis
 - enter player preferences and constraints
-- send analysis-grounded coaching prompts
+- send analysis-grounded coaching prompts and read structured coaching sections
 - review structured shot analysis results, top fixes, and coaching notes
 
 ## Local Run

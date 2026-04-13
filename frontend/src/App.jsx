@@ -57,6 +57,113 @@ function getMetricUi(metric) {
   };
 }
 
+function hasPreferenceInput(prefs) {
+  return Boolean(
+    prefs.shot_style.trim() ||
+      splitCsv(prefs.do_not_change).length ||
+      splitCsv(prefs.focus_areas).length ||
+      splitCsv(prefs.physical_constraints).length ||
+      splitCsv(prefs.environment_notes).length
+  );
+}
+
+function splitChatReply(reply) {
+  return reply
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function getChatSectionKey(line, hasPriority) {
+  const lower = line.toLowerCase();
+
+  if (
+    lower.includes("constraint") ||
+    lower.includes("won't force") ||
+    lower.includes("locked mechanics") ||
+    lower.includes("shot style noted") ||
+    lower.includes("priority focus") ||
+    lower.includes("environment context")
+  ) {
+    return "constraints";
+  }
+
+  if (
+    lower.includes("analysis") ||
+    lower.includes("metric") ||
+    lower.includes("confidence") ||
+    lower.includes("because") ||
+    lower.includes("evidence") ||
+    lower.includes("knee") ||
+    lower.includes("drift")
+  ) {
+    return "reasoning";
+  }
+
+  if (!hasPriority || lower.includes("fix first") || lower.includes("what should i fix")) {
+    return "priority";
+  }
+
+  return "supporting";
+}
+
+function parseChatSections(reply) {
+  const lines = splitChatReply(reply);
+  const sections = {
+    priority: [],
+    supporting: [],
+    reasoning: [],
+    constraints: [],
+  };
+
+  lines.forEach((line) => {
+    const key = getChatSectionKey(line, sections.priority.length > 0);
+    sections[key].push(line);
+  });
+
+  return [
+    ["priority", "Priority Fix"],
+    ["supporting", "Supporting Adjustments"],
+    ["reasoning", "Reasoning"],
+    ["constraints", "Constraints Awareness"],
+  ]
+    .map(([key, label]) => ({ key, label, lines: sections[key] }))
+    .filter((section) => section.lines.length);
+}
+
+function ChatResponsePanel({ reply, hasAnalysis, hasPreferences }) {
+  const sections = parseChatSections(reply);
+
+  return (
+    <div className="chatResponsePanel">
+      <div className="chatContextRow">
+        {hasAnalysis ? <span className="contextChip">Based on latest shot analysis</span> : null}
+        {hasPreferences ? <span className="contextChip">Adjusted for your preferences</span> : null}
+        {!hasAnalysis && !hasPreferences ? <span className="contextChip mutedChip">General coaching context</span> : null}
+      </div>
+
+      {sections.length ? (
+        <div className="chatSections">
+          {sections.map((section) => (
+            <section className="chatSection" key={section.key}>
+              <h3>{section.label}</h3>
+              {section.lines.map((line, index) => (
+                <p key={`${section.key}-${index}`}>{line}</p>
+              ))}
+            </section>
+          ))}
+        </div>
+      ) : (
+        <p className="muted">No reply yet.</p>
+      )}
+
+      <div className="chatDisclaimer">
+        Coaching is based on the current limited analysis and any preferences you provide. It is not a full biomechanics review yet.
+      </div>
+    </div>
+  );
+}
+
 function ShotAnalysisResults({ analysis }) {
   const trackedMetrics = ["knee_bend_depth", "drift"]
     .map((name) => analysis?.metrics?.find((metric) => metric.name === name))
@@ -338,7 +445,11 @@ export default function App() {
             <button className="primary" onClick={onChat}>Send to /chat</button>
           </div>
 
-          <pre>{chatReply || "No reply yet."}</pre>
+          <ChatResponsePanel
+            reply={chatReply}
+            hasAnalysis={Boolean(analysis)}
+            hasPreferences={hasPreferenceInput(prefs)}
+          />
         </div>
       </section>
     </div>

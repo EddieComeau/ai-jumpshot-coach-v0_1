@@ -11,17 +11,17 @@ AI Jumpshot Coach is a desktop-first basketball shot analysis MVP. The current p
 ## Current Milestone
 
 ### Milestone
-M2: Analysis UI transformation
+M3: Chat Response UI Structuring
 
 ### Objective
-Replace raw JSON analysis display with a structured, user-friendly results UI while preserving backend behavior.
+Improve frontend display of chat responses by structuring them into clear, readable coaching sections without modifying backend behavior.
 
 ### In Scope
 - frontend-only presentation changes
-- metric cards for `knee_bend_depth` and `drift`
-- simple status labels and short coaching text
-- top fixes from the existing backend response
-- persistent placeholder analysis disclaimer
+- structured chat response rendering
+- context indicators for latest analysis and preferences
+- limited-analysis coaching disclaimer
+- compatibility with empty, short, rules fallback, and Ollama responses
 - continuity-doc updates after implementation
 
 ### Out Of Scope
@@ -31,6 +31,7 @@ Replace raw JSON analysis display with a structured, user-friendly results UI wh
 - ML-based shot evaluation
 - autonomous recommendation loops
 - analysis logic changes
+- prompt or chat logic changes
 - authority shifts where support layers become decision layers
 - speculative intelligence layers not backed by implemented behavior
 
@@ -73,9 +74,9 @@ These checkpoints should be surfaced proactively, not only when requested.
 
 Priority should stay on small MVP-strengthening slices. Good next steps would be:
 - tighten API contracts and add lightweight backend tests
-- make coaching responses more structured while still grounded in available analysis
 - improve local run ergonomics and setup clarity
 - refine the visual design of the results UI after manual review
+- refine chat section heuristics after manual review of real Ollama/rules responses
 
 ## Milestone Framing Template
 
