@@ -69,6 +69,68 @@ Backward compatibility: `CHAT_PROVIDER=stub` still maps to `rules`.
 
 Use `GET /chat/status` to confirm provider state and Ollama connectivity.
 
+## Manual Smoke Test Checklist
+
+Use this 5-10 minute checklist after starting the backend and frontend locally. The goal is to verify major MVP runtime paths without changing app behavior.
+
+### 1. No Analysis State
+
+1. Start the backend with the default `mesh` mode or `CHAT_PROVIDER=rules`.
+2. Start the frontend with `npm run dev`.
+3. Do not upload a video.
+4. In Coach Chat, leave or enter a short message such as `What should I fix first?`.
+5. Click `Send to /chat`.
+6. Expected: the app does not crash, a coaching response appears, and the chat panel handles the missing analysis state gracefully.
+
+### 2. Analysis Flow
+
+1. Upload a local video file.
+2. Click `Analyze`.
+3. Expected: the `Shot Analysis` section renders metric cards for `Knee Bend Depth` and `Forward Drift`.
+4. Expected: `Top Fixes`, `Coach Notes`, and the placeholder-analysis disclaimer are visible.
+
+### 3. Chat With Analysis
+
+1. Complete the analysis flow first.
+2. Ask a coaching question such as `What should I fix first?`.
+3. Click `Send to /chat`.
+4. Expected: the chat response appears in structured sections, and `Based on latest shot analysis` is visible.
+
+### 4. Preferences Applied
+
+1. Enter at least one preference, such as a shot style or a do-not-change note.
+2. Ask a coaching question.
+3. Expected: the chat response reflects the preference where applicable, and `Adjusted for your preferences` is visible.
+
+### 5. Rules Mode
+
+1. Stop the backend if it is running.
+2. Start it with rules mode:
+
+```bash
+cd backend
+export CHAT_PROVIDER=rules
+bash run.sh
+```
+
+3. Send a chat message from the frontend.
+4. Expected: chat works without Ollama, provider status shows rules mode, and the structured chat UI still renders the response.
+
+### 6. Mesh Mode
+
+1. Stop the backend if it is running.
+2. Start it with mesh mode:
+
+```bash
+cd backend
+export CHAT_PROVIDER=mesh
+bash run.sh
+```
+
+3. If Ollama is available, send a chat message and verify the response renders in the structured chat UI.
+4. If Ollama is unavailable, send a chat message and verify the rules fallback response still renders without crashing.
+5. Expected: mesh mode works with either Ollama output or fallback output, and `/chat/status` reflects the current connection state.
+
 ## Current Analysis Behavior
 
 `/analyze` currently returns:
