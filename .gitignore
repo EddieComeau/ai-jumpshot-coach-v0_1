@@ -13,5 +13,6 @@ frontend/dist/
 *.log
 
 # Local continuity / handoff docs
+CHATGPT_README.md
 CODEX_README.md
 CHATGPT_HANDOFF_2026-04-11.md
