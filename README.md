@@ -72,6 +72,16 @@ Run a production frontend build:
 npm run build
 ```
 
+### Backend Tests
+
+Run lightweight backend API contract tests:
+
+```bash
+cd backend
+source .venv/bin/activate
+pytest
+```
+
 ## Chat Provider Modes
 
 The backend supports two main chat provider modes.
