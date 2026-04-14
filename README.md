@@ -19,7 +19,11 @@ The desktop UI lets you:
 
 ## Local Run
 
+Run the backend and frontend in separate terminal windows.
+
 ### Backend
+
+From a fresh checkout:
 
 ```bash
 cd backend
@@ -31,25 +35,70 @@ bash run.sh
 
 Backend URL: `http://127.0.0.1:8000`
 
+Check the backend:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
 ### Frontend
+
+Install frontend dependencies:
 
 ```bash
 cd frontend
 npm install
+```
+
+Run the desktop dev app:
+
+```bash
 npm run dev
 ```
 
 This starts Vite and Electron for local desktop development.
 
-## Chat Provider Modes
-
-Default mode is `mesh`:
-- tries Ollama first
-- falls back to local rules-based coaching if Ollama is unavailable
-
-Mesh mode:
+If Electron launches as Node instead of Electron, use:
 
 ```bash
+env -u ELECTRON_RUN_AS_NODE npm run dev
+```
+
+This is only needed when the shell has `ELECTRON_RUN_AS_NODE=1` set. In that state, Electron can fail with `TypeError: Cannot read properties of undefined (reading 'whenReady')` because the Electron runtime is being forced into Node mode.
+
+Run a production frontend build:
+
+```bash
+npm run build
+```
+
+## Chat Provider Modes
+
+The backend supports two main chat provider modes.
+
+### Rules Mode
+
+Rules mode does not attempt Ollama. Use this when you want the app to run without any local LLM dependency:
+
+```bash
+cd backend
+source .venv/bin/activate
+export CHAT_PROVIDER=rules
+bash run.sh
+```
+
+Expected behavior:
+- `/chat/status` reports `provider: rules`
+- chat works without Ollama
+- responses come from local fallback rules
+
+### Mesh Mode
+
+Mesh mode is the default. It tries Ollama first and falls back to local rules-based coaching if Ollama is unavailable:
+
+```bash
+cd backend
+source .venv/bin/activate
 export CHAT_PROVIDER=mesh
 export OLLAMA_MODEL=llama3.1:8b
 # optional:
@@ -58,16 +107,58 @@ export OLLAMA_MODEL=llama3.1:8b
 bash run.sh
 ```
 
-Rules-only mode:
-
-```bash
-export CHAT_PROVIDER=rules
-bash run.sh
-```
-
 Backward compatibility: `CHAT_PROVIDER=stub` still maps to `rules`.
 
 Use `GET /chat/status` to confirm provider state and Ollama connectivity.
+
+## Common Issues
+
+### Electron Starts As Node
+
+Symptom:
+- `npm run dev` fails with `TypeError: Cannot read properties of undefined (reading 'whenReady')`
+
+Cause:
+- the shell has `ELECTRON_RUN_AS_NODE=1` set
+
+Fix:
+
+```bash
+cd frontend
+env -u ELECTRON_RUN_AS_NODE npm run dev
+```
+
+### Ollama Is Not Running
+
+Symptom:
+- `/chat/status` reports `provider: mesh`, but `ollama.connected` is `false`
+- chat response includes an Ollama unavailable fallback note
+
+Expected behavior:
+- mesh mode should still return a local fallback coaching response
+
+Fix options:
+- start Ollama and make sure the configured `OLLAMA_MODEL` is available
+- or use `CHAT_PROVIDER=rules` to skip Ollama entirely
+
+### Backend Is Not Running
+
+Symptom:
+- frontend health, analyze, chat, or chat status requests fail
+
+Fix:
+
+```bash
+cd backend
+source .venv/bin/activate
+bash run.sh
+```
+
+Then confirm:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
 
 ## Manual Smoke Test Checklist
 
