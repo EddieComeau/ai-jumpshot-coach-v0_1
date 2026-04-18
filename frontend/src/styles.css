@@ -58,6 +58,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 button.primary {
   background: #2a5bd7;
   border-color: #2a5bd7;
@@ -99,6 +104,12 @@ button.primary {
   color: #fecaca;
   border-color: #7f1d1d;
   background: #450a0a;
+}
+
+.statusPill.neutral {
+  color: #bfdbfe;
+  border-color: #1d4ed8;
+  background: #172554;
 }
 
 .muted {
@@ -252,6 +263,23 @@ button.primary {
   border-radius: 12px;
   background: #0b0f14;
   padding: 14px;
+}
+
+.chatResponseHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.chatResponseHeader h3 {
+  margin: 0;
+}
+
+.loadingText {
+  color: #9fb0c0;
+  font-size: 12px;
 }
 
 .chatContextRow {

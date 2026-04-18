@@ -78,7 +78,23 @@ function getChatSectionKey(line, hasPriority) {
   const lower = line.toLowerCase();
 
   if (
+    lower.includes("fix first") ||
+    lower.startsWith("fix ") ||
+    lower.includes("recommend") ||
+    lower.includes("suggest") ||
+    lower.includes("addressing") ||
+    lower.includes("starting with") ||
+    lower.includes("start with") ||
+    lower.includes("start by") ||
+    lower.includes("let's start")
+  ) {
+    return "priority";
+  }
+
+  if (
     lower.includes("constraint") ||
+    lower.includes("preference") ||
+    lower.includes("preferred") ||
     lower.includes("won't force") ||
     lower.includes("locked mechanics") ||
     lower.includes("shot style noted") ||
@@ -100,7 +116,7 @@ function getChatSectionKey(line, hasPriority) {
     return "reasoning";
   }
 
-  if (!hasPriority || lower.includes("fix first") || lower.includes("what should i fix")) {
+  if (!hasPriority || lower.includes("what should i fix")) {
     return "priority";
   }
 
@@ -131,18 +147,41 @@ function parseChatSections(reply) {
     .filter((section) => section.lines.length);
 }
 
-function ChatResponsePanel({ reply, hasAnalysis, hasPreferences }) {
+function getChatStatusLabel(chatConn) {
+  if (chatConn?.provider === "rules") return "Rules mode";
+  if (chatConn?.provider === "ollama") {
+    return chatConn?.ollama?.connected ? "Ollama connected" : "Ollama disconnected";
+  }
+  if (chatConn?.provider === "mesh") {
+    return chatConn?.ollama?.connected ? "Mesh + Ollama" : "Mesh fallback";
+  }
+  return "Checking chat";
+}
+
+function getChatStatusClass(chatConn) {
+  if (chatConn?.provider === "rules") return "neutral";
+  return chatConn?.ollama?.connected ? "on" : "off";
+}
+
+function ChatResponsePanel({ reply, hasAnalysis, hasPreferences, isLoading }) {
   const sections = parseChatSections(reply);
 
   return (
     <div className="chatResponsePanel">
+      <div className="chatResponseHeader">
+        <h3>Coach Response</h3>
+        {isLoading ? <span className="loadingText">Thinking with current context...</span> : null}
+      </div>
+
       <div className="chatContextRow">
         {hasAnalysis ? <span className="contextChip">Based on latest shot analysis</span> : null}
         {hasPreferences ? <span className="contextChip">Adjusted for your preferences</span> : null}
         {!hasAnalysis && !hasPreferences ? <span className="contextChip mutedChip">General coaching context</span> : null}
       </div>
 
-      {sections.length ? (
+      {isLoading ? (
+        <p className="muted">Waiting for coach response...</p>
+      ) : sections.length ? (
         <div className="chatSections">
           {sections.map((section) => (
             <section className="chatSection" key={section.key}>
@@ -247,6 +286,7 @@ export default function App() {
   const [healthRes, setHealthRes] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [chatReply, setChatReply] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
   const [chatConn, setChatConn] = useState(null);
   const [chatMessage, setChatMessage] = useState("What should I fix first?");
   const [prefs, setPrefs] = useState({
@@ -325,6 +365,7 @@ export default function App() {
     }
 
     try {
+      setChatLoading(true);
       const payload = {
         message: chatMessage,
         preferences: parsedPreferences(),
@@ -334,6 +375,8 @@ export default function App() {
       setChatReply(res.reply || "");
     } catch (e) {
       setError(String(e.message || e));
+    } finally {
+      setChatLoading(false);
     }
   }
 
@@ -419,14 +462,8 @@ export default function App() {
         <div className="card">
           <h2>Coach Chat</h2>
           <div className="row rowBetween">
-            <span className={`statusPill ${chatConn?.ollama?.connected ? "on" : "off"}`}>
-              {chatConn?.provider === "ollama"
-                ? chatConn?.ollama?.connected
-                  ? "Ollama connected"
-                  : "Ollama disconnected"
-                : chatConn?.provider === "rules"
-                  ? "Rules mode"
-                  : "Mesh mode"}
+            <span className={`statusPill ${getChatStatusClass(chatConn)}`}>
+              {getChatStatusLabel(chatConn)}
             </span>
             <button onClick={onCheckChatStatus}>Refresh chat status</button>
           </div>
@@ -442,13 +479,16 @@ export default function App() {
           />
 
           <div className="row">
-            <button className="primary" onClick={onChat}>Send to /chat</button>
+            <button className="primary" onClick={onChat} disabled={chatLoading}>
+              {chatLoading ? "Sending..." : "Send to /chat"}
+            </button>
           </div>
 
           <ChatResponsePanel
             reply={chatReply}
             hasAnalysis={Boolean(analysis)}
             hasPreferences={hasPreferenceInput(prefs)}
+            isLoading={chatLoading}
           />
         </div>
       </section>

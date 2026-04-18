@@ -82,6 +82,37 @@ source .venv/bin/activate
 pytest
 ```
 
+## Verification
+
+Use these quick checks to confirm the current MVP is healthy:
+
+```bash
+cd backend
+.venv/bin/pytest
+```
+
+```bash
+cd frontend
+npm run build
+```
+
+For runtime behavior, follow the `Manual Smoke Test Checklist` below.
+
+For Ollama mesh mode:
+
+```bash
+ollama serve
+ollama list
+```
+
+Then run the backend with `CHAT_PROVIDER=mesh` and confirm:
+
+```bash
+curl http://127.0.0.1:8000/chat/status
+```
+
+Expected: `provider` is `mesh`, `ollama.connected` is `true`, and `model_available` is `true`. If Ollama is unavailable, mesh mode should fall back to the local rules response without crashing.
+
 ## Chat Provider Modes
 
 The backend supports two main chat provider modes.
@@ -253,6 +284,50 @@ Results:
 - PASS: Frontend dev server launch. Vite served the app at `http://127.0.0.1:5173/`.
 - PASS: Electron dev app launch. `npm run dev` launched after unsetting `ELECTRON_RUN_AS_NODE`.
 - PASS: Frontend production build. `cd frontend && npm run build` completed successfully.
+
+## Ollama Verification
+
+Latest verification: April 17, 2026
+
+Environment:
+- Ollama CLI available at `/usr/local/bin/ollama`
+- Ollama server available at `http://127.0.0.1:11434`
+- Model installed: `llama3.1:8b`
+
+Results:
+- PASS: `ollama list` showed `llama3.1:8b`.
+- PASS: `GET /chat/status` in `CHAT_PROVIDER=mesh` reported `ollama.connected: true` and `model_available: true`.
+- PASS: No-analysis chat returned a live Ollama response without fallback text.
+- PASS: Chat with `last_analysis` returned a live Ollama response grounded in the provided placeholder metrics.
+- PASS: Chat with preferences returned a live Ollama response that considered provided user context.
+- PASS: Frontend production build still passed after verification.
+- PASS: Backend API contract tests still passed after verification.
+- PASS: Mesh fallback behavior was confirmed by running the backend with an unavailable `OLLAMA_BASE_URL`; chat returned the local fallback without crashing.
+
+Notes:
+- The fallback check used `OLLAMA_BASE_URL=http://127.0.0.1:59999` instead of stopping the user's Ollama service.
+- No backend logic, prompt, UI, or feature changes were introduced for this verification.
+
+## Frontend Clickthrough Review
+
+Latest review: April 17, 2026
+
+Live Ollama clickthrough results:
+- PASS: Electron app launched with `env -u ELECTRON_RUN_AS_NODE npm run dev`.
+- PASS: Backend ran in `CHAT_PROVIDER=mesh` with `llama3.1:8b`.
+- PASS: `/chat/status` reported live Ollama connectivity.
+- PASS: Analysis upload returned metric cards, top fixes, notes, and placeholder disclaimer data.
+- PASS: No-analysis chat, chat with analysis, and chat with preferences returned live Ollama responses.
+- PASS: Backend API contract tests still passed.
+- PASS: Frontend production build still passed.
+
+Targeted presentation fixes from review:
+- Added a visible loading state while live Ollama responses are pending.
+- Clarified mesh status labels as `Mesh + Ollama` or `Mesh fallback`.
+- Improved chat section grouping so recommendation lines and numbered fixes stay under `Priority Fix`.
+- Improved preference-related grouping for `Constraints Awareness`.
+
+No backend behavior, prompt logic, response wording, or feature scope changed.
 
 ## Current Analysis Behavior
 
