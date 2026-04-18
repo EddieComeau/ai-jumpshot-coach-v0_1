@@ -46,7 +46,7 @@ function getMetricUi(metric) {
   const config = METRIC_COPY[metric.name] || {
     label: metric.name,
     getStatus: () => "warning",
-    getCoachingText: () => "Review this metric as an early-stage signal, not a final diagnosis.",
+    getCoachingText: () => "Treat this as an early read, not a final diagnosis.",
   };
 
   return {
@@ -138,10 +138,10 @@ function parseChatSections(reply) {
   });
 
   return [
-    ["priority", "Priority Fix"],
-    ["supporting", "Supporting Adjustments"],
-    ["reasoning", "Reasoning"],
-    ["constraints", "Constraints Awareness"],
+    ["priority", "Fix First"],
+    ["supporting", "Other Cues"],
+    ["reasoning", "Why This Matters"],
+    ["constraints", "Your Preferences"],
   ]
     .map(([key, label]) => ({ key, label, lines: sections[key] }))
     .filter((section) => section.lines.length);
@@ -153,9 +153,9 @@ function getChatStatusLabel(chatConn) {
     return chatConn?.ollama?.connected ? "Ollama connected" : "Ollama disconnected";
   }
   if (chatConn?.provider === "mesh") {
-    return chatConn?.ollama?.connected ? "Mesh + Ollama" : "Mesh fallback";
+    return chatConn?.ollama?.connected ? "Ollama active" : "Using fallback";
   }
-  return "Checking chat";
+  return "Checking coach";
 }
 
 function getChatStatusClass(chatConn) {
@@ -169,18 +169,18 @@ function ChatResponsePanel({ reply, hasAnalysis, hasPreferences, isLoading }) {
   return (
     <div className="chatResponsePanel">
       <div className="chatResponseHeader">
-        <h3>Coach Response</h3>
-        {isLoading ? <span className="loadingText">Thinking with current context...</span> : null}
+        <h3>Coach Notes</h3>
+        {isLoading ? <span className="loadingText">Reading your shot context...</span> : null}
       </div>
 
       <div className="chatContextRow">
-        {hasAnalysis ? <span className="contextChip">Based on latest shot analysis</span> : null}
-        {hasPreferences ? <span className="contextChip">Adjusted for your preferences</span> : null}
-        {!hasAnalysis && !hasPreferences ? <span className="contextChip mutedChip">General coaching context</span> : null}
+        {hasAnalysis ? <span className="contextChip">Using latest analysis</span> : null}
+        {hasPreferences ? <span className="contextChip">Using your preferences</span> : null}
+        {!hasAnalysis && !hasPreferences ? <span className="contextChip mutedChip">General guidance</span> : null}
       </div>
 
       {isLoading ? (
-        <p className="muted">Waiting for coach response...</p>
+        <p className="muted">Getting coach notes...</p>
       ) : sections.length ? (
         <div className="chatSections">
           {sections.map((section) => (
@@ -193,11 +193,11 @@ function ChatResponsePanel({ reply, hasAnalysis, hasPreferences, isLoading }) {
           ))}
         </div>
       ) : (
-        <p className="muted">No reply yet.</p>
+        <p className="muted">Ask a question to see coach notes here.</p>
       )}
 
       <div className="chatDisclaimer">
-        Coaching is based on the current limited analysis and any preferences you provide. It is not a full biomechanics review yet.
+        Coaching is based on this early analysis and your notes. It is not a full biomechanics review.
       </div>
     </div>
   );
@@ -212,7 +212,7 @@ function ShotAnalysisResults({ analysis }) {
     return (
       <div className="emptyState">
         <h2>Shot Analysis</h2>
-        <p>Upload a clip and click Analyze to see your early-stage shot readout.</p>
+        <p>Upload a clip and run Analyze to see your first shot readout.</p>
       </div>
     );
   }
@@ -224,11 +224,11 @@ function ShotAnalysisResults({ analysis }) {
           <h2>Shot Analysis</h2>
           <p className="muted compact">Results for {analysis.video_filename || "uploaded clip"}</p>
         </div>
-        <span className="statusPill off">Placeholder analysis</span>
+        <span className="statusPill off">Early analysis</span>
       </div>
 
       <div className="disclaimer">
-        Early-stage placeholder analysis: these metrics are fixed MVP signals, not validated pose tracking or real biomechanics yet.
+        Early analysis only: these results are MVP signals, not validated pose tracking or a full biomechanics review.
       </div>
 
       <div className="metricGrid">
@@ -243,7 +243,7 @@ function ShotAnalysisResults({ analysis }) {
               <div className="metricValue">{ui.value}</div>
               <p>{ui.coachingText}</p>
               <div className="metricMeta">
-                Confidence: {Math.round((metric.confidence || 0) * 100)}% | Source: placeholder
+                Confidence: {Math.round((metric.confidence || 0) * 100)}% | Source: early analysis
               </div>
             </article>
           );
@@ -263,7 +263,7 @@ function ShotAnalysisResults({ analysis }) {
             ))}
           </ol>
         ) : (
-          <p className="muted">No fixes returned for this clip.</p>
+          <p className="muted">No top fixes returned for this clip.</p>
         )}
       </div>
 
@@ -397,7 +397,7 @@ export default function App() {
         <div className="muted">{fileInfo}</div>
 
         <div className="row">
-          <button onClick={onCheckHealth}>Check /health</button>
+          <button onClick={onCheckHealth}>Check backend</button>
           <button className="primary" onClick={onAnalyze}>Analyze</button>
         </div>
 
