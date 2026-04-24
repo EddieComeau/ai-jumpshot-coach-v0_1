@@ -226,13 +226,13 @@ Use this 5-10 minute checklist after starting the backend and frontend locally. 
 1. Complete the analysis flow first.
 2. Ask a coaching question such as `What should I fix first?`.
 3. Click `Send to /chat`.
-4. Expected: the chat response appears in structured sections, and `Based on latest shot analysis` is visible.
+4. Expected: the chat response appears in structured sections such as `Fix First` and `Why This Matters`, and `Using latest analysis` is visible.
 
 ### 4. Preferences Applied
 
 1. Enter at least one preference, such as a shot style or a do-not-change note.
 2. Ask a coaching question.
-3. Expected: the chat response reflects the preference where applicable, and `Adjusted for your preferences` is visible.
+3. Expected: the chat response reflects the preference where applicable, and `Using your preferences` is visible.
 
 ### 5. Rules Mode
 
@@ -323,11 +323,21 @@ Live Ollama clickthrough results:
 
 Targeted presentation fixes from review:
 - Added a visible loading state while live Ollama responses are pending.
-- Clarified mesh status labels as `Mesh + Ollama` or `Mesh fallback`.
-- Improved chat section grouping so recommendation lines and numbered fixes stay under `Priority Fix`.
-- Improved preference-related grouping for `Constraints Awareness`.
+- Clarified mesh status labels as `Ollama active` or `Using fallback`.
+- Improved chat section grouping so recommendation lines and numbered fixes stay under `Fix First`.
+- Improved preference-related grouping for `Your Preferences`.
 
 No backend behavior, prompt logic, response wording, or feature scope changed.
+
+## Launch-Readiness Review
+
+Latest review: April 24, 2026
+
+Launch-readiness notes:
+- README setup, verification, and Ollama instructions were checked against the current local run flow.
+- Manual smoke checklist wording was aligned to the current frontend labels.
+- The current UI labels to expect are `Fix First`, `Other Cues`, `Why This Matters`, `Your Preferences`, `Ollama active`, `Using fallback`, `Using latest analysis`, and `Using your preferences`.
+- No backend behavior changes or feature changes were needed for this review.
 
 ## Current Analysis Behavior
 
