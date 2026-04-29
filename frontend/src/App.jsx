@@ -480,7 +480,7 @@ export default function App() {
 
           <div className="row">
             <button className="primary" onClick={onChat} disabled={chatLoading}>
-              {chatLoading ? "Sending..." : "Send to /chat"}
+              {chatLoading ? "Asking coach..." : "Ask Coach"}
             </button>
           </div>
 

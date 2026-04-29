@@ -211,7 +211,7 @@ Use this 5-10 minute checklist after starting the backend and frontend locally. 
 2. Start the frontend with `npm run dev`.
 3. Do not upload a video.
 4. In Coach Chat, leave or enter a short message such as `What should I fix first?`.
-5. Click `Send to /chat`.
+5. Click `Ask Coach`.
 6. Expected: the app does not crash, a coaching response appears, and the chat panel handles the missing analysis state gracefully.
 
 ### 2. Analysis Flow
@@ -225,7 +225,7 @@ Use this 5-10 minute checklist after starting the backend and frontend locally. 
 
 1. Complete the analysis flow first.
 2. Ask a coaching question such as `What should I fix first?`.
-3. Click `Send to /chat`.
+3. Click `Ask Coach`.
 4. Expected: the chat response appears in structured sections such as `Fix First` and `Why This Matters`, and `Using latest analysis` is visible.
 
 ### 4. Preferences Applied
@@ -331,13 +331,14 @@ No backend behavior, prompt logic, response wording, or feature scope changed.
 
 ## Launch-Readiness Review
 
-Latest review: April 24, 2026
+Latest review: April 29, 2026
 
 Launch-readiness notes:
 - README setup, verification, and Ollama instructions were checked against the current local run flow.
 - Manual smoke checklist wording was aligned to the current frontend labels.
-- The current UI labels to expect are `Fix First`, `Other Cues`, `Why This Matters`, `Your Preferences`, `Ollama active`, `Using fallback`, `Using latest analysis`, and `Using your preferences`.
-- No backend behavior changes or feature changes were needed for this review.
+- The current UI labels to expect are `Ask Coach`, `Fix First`, `Other Cues`, `Why This Matters`, `Your Preferences`, `Ollama active`, `Using fallback`, `Using latest analysis`, and `Using your preferences`.
+- The chat submit button was renamed from `Send to /chat` to `Ask Coach` so the desktop UI reads like a coaching action instead of an API call.
+- No backend behavior, prompt logic, or feature changes were needed for this review.
 
 ## Current Analysis Behavior
 
