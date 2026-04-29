@@ -3,6 +3,15 @@ import tempfile
 from typing import Dict, Any, List, Tuple
 
 
+ANALYSIS_MODE = "placeholder"
+ANALYSIS_SOURCE = "rules_placeholder"
+ANALYSIS_LIMITATIONS = [
+    "Pose extraction is not enabled in v0.1.",
+    "Metric values are deterministic placeholder signals, not validated biomechanics.",
+    "Rules may interpret returned metrics but must not create measurements that are absent from analysis.",
+]
+
+
 # MVP NOTE:
 # - Kept runnable with zero heavy CV dependencies.
 # - Real pose extraction can be added later in this module.
@@ -80,6 +89,9 @@ def analyze_video_bytes(video_bytes: bytes, filename: str) -> Dict[str, Any]:
         return {
             "ok": True,
             "video_filename": filename,
+            "analysis_mode": ANALYSIS_MODE,
+            "source": ANALYSIS_SOURCE,
+            "limitations": ANALYSIS_LIMITATIONS,
             "metrics": metrics,
             "fixes": fixes,
             "notes": notes,

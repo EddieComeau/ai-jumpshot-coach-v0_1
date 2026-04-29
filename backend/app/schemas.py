@@ -20,6 +20,9 @@ class RuleFix(BaseModel):
 class AnalyzeResponse(BaseModel):
     ok: bool
     video_filename: str
+    analysis_mode: str
+    source: str
+    limitations: List[str]
     metrics: List[Metric]
     fixes: List[RuleFix]
     notes: List[str]

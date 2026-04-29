@@ -95,3 +95,19 @@ Why:
 Must preserve:
 - checkpoint calls should be based on actual implementation and verification state
 - if a checkpoint is not ready, say so directly instead of implying readiness
+
+## D8: Analysis Contract Carries Measurement Authority
+
+Decision:
+- `/analyze` exposes explicit analysis metadata: `analysis_mode`, `source`, `limitations`, and per-metric `confidence`
+- current values remain placeholder signals from `rules_placeholder`
+
+Why:
+- prepares the response contract for future real pose/video measurements without adding pose extraction now
+- keeps measurement truth inside the analysis layer
+- prevents chat or frontend code from becoming hidden metric authorities
+
+Must preserve:
+- future real analysis should plug into `backend/app/analysis.py` and keep the response contract compatible where possible
+- rules may interpret returned metrics but must not invent measurements
+- chat may explain latest analysis and preferences but must not create unseen biomechanics data

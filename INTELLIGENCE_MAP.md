@@ -48,12 +48,14 @@ Location:
 Responsibilities:
 - manage uploaded video bytes
 - produce bounded placeholder metrics
+- mark the response contract with `analysis_mode`, `source`, `limitations`, and per-metric `confidence`
 - derive simple rules-engine fixes
 
 Current limitations:
 - no pose extraction
 - no frame-level analysis
 - no persisted artifacts
+- current metric values are deterministic placeholders, not validated biomechanics
 
 ### Coaching Layer
 
@@ -91,6 +93,7 @@ Responsibilities:
 
 Current authority boundaries must stay clear:
 - analysis output is the only metric authority
+- future pose extraction should replace or extend `backend/app/analysis.py` outputs, not move measurement authority into chat or frontend code
 - rules engine may interpret metrics but must not invent new ones
 - chat may explain and coach, but should not become a hidden scoring engine
 - frontend is a presentation and input layer, not a source of decision truth
