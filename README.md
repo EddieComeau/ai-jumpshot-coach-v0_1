@@ -364,6 +364,19 @@ Contract boundary:
 
 Future pose or video extraction should plug into the backend analysis layer and continue returning known metrics through `/analyze` where possible. Real measurement authority should not move into chat or frontend code.
 
+Future real-analysis integration plan:
+- video continues entering through `POST /analyze`
+- future frame extraction or detection should happen inside the analysis layer before metrics are returned
+- new measurable concepts should be added as metric objects using the existing structure:
+  - `name`
+  - `value`
+  - `units`
+  - `confidence`
+  - optional `notes`
+- the initial compatibility goal is to keep the current top-level `/analyze` response valid so the frontend can continue rendering without an immediate redesign
+- if video quality is poor or some measurements cannot be extracted, analysis should still return a valid response and make limits explicit through `confidence`, metric `notes`, or top-level `limitations`
+- chat and rules must stay grounded in only the metrics present in the analysis payload
+
 ## Current Constraints
 
 This repo does not currently include:

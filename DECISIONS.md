@@ -113,3 +113,26 @@ Must preserve:
 - rules may interpret returned metrics but must not invent measurements
 - chat may explain latest analysis and preferences but must not create unseen biomechanics data
 - frontend may present and group analysis results, but it must not create new metrics, confidence values, or analysis conclusions
+- low-confidence, partial, or failed measurements should be expressed through existing contract fields such as `confidence`, metric `notes`, and top-level `limitations`
+
+## D9: Future Real Analysis Should Arrive As A Staged Plug-In
+
+Decision:
+- future real pose/video analysis should be documented as a staged pipeline inside the analysis layer:
+  - input
+  - preprocessing
+  - measurement extraction
+  - metric normalization
+  - rules interpretation
+- new measurable concepts should enter the system as additional metric objects using the existing metric structure
+
+Why:
+- makes the integration path for real analysis obvious without implementing CV now
+- protects the frontend from unnecessary first-wave contract churn
+- keeps rules and chat grounded in analysis-owned measurements
+
+Must preserve:
+- `POST /analyze` remains the only measurement authority boundary
+- existing top-level response fields should remain valid when real measurements are introduced
+- placeholder outputs should be replaceable by real metrics without moving authority into chat or frontend
+- missing or low-confidence measurements must not be silently inferred by downstream layers

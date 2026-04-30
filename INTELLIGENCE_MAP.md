@@ -58,6 +58,25 @@ Current limitations:
 - no persisted artifacts
 - current metric values are deterministic placeholders, not validated biomechanics
 
+Future real-analysis interface plan:
+- input boundary: uploaded video bytes continue entering through `POST /analyze` and are handed to `backend/app/analysis.py`
+- preprocessing stage: future frame extraction, tracking, or detection should happen inside the analysis layer before any metric is emitted
+- measurement stage: pose/video signals should be converted into bounded measurements before rules or chat see them
+- normalization stage: every returned metric should keep the existing structure of `name`, `value`, `units`, `confidence`, and optional `notes`
+- interpretation stage: rules may interpret normalized metrics, but they must not create missing measurements
+- response stage: `/analyze` should keep returning the current top-level contract so the frontend can keep rendering without an initial redesign
+
+Future metric expansion model:
+- new metrics such as release angle, elbow alignment, or timing should be added as additional metric objects in the existing `metrics` list
+- placeholder metrics should be replaceable by real measurements, not removed as a concept from the contract
+- each metric should carry its own confidence and optional notes so partial or low-trust measurements stay explicit
+- if a metric cannot be measured for a clip, analysis should omit that metric or mark its limits in `notes`/`limitations` rather than letting downstream layers infer it
+
+Partial-data handling plan:
+- poor video quality, occlusion, or short clips should still produce a valid `/analyze` response when possible
+- low-confidence or missing measurements should be surfaced through metric `confidence`, metric `notes`, and top-level `limitations`
+- chat and rules must stay grounded in only the metrics that actually appear in analysis output
+
 ### Coaching Layer
 
 Location:
@@ -80,6 +99,14 @@ Responsibilities:
 5. Rules engine derives up to 3 fixes plus notes.
 6. Backend returns the response and removes the temp file.
 7. Frontend presents the existing response as metric cards, top fixes, notes, and a placeholder disclaimer.
+
+Future staged model:
+1. Input: uploaded video bytes enter the analysis layer.
+2. Preprocessing: optional future frame extraction / detection runs inside analysis.
+3. Measurement extraction: raw pose/video signals become candidate measurements.
+4. Metric normalization: candidate measurements are emitted as contract-compatible metric objects.
+5. Rules interpretation: the rules layer interprets returned metrics into bounded fixes and notes.
+6. Presentation: frontend and chat explain returned analysis without creating new measurement truth.
 
 ### Chat Flow
 

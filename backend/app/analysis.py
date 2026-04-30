@@ -16,6 +16,12 @@ ANALYSIS_LIMITATIONS = [
 # MVP NOTE:
 # - Kept runnable with zero heavy CV dependencies.
 # - Real pose extraction can be added later in this module.
+# - Future real-analysis pipeline should stay in this layer:
+#   1. ingest uploaded video bytes
+#   2. preprocess frames / detections
+#   3. extract measurements
+#   4. normalize measurements into metric objects
+#   5. return the existing analysis contract for rules + chat consumption
 
 def save_upload_to_temp(contents: bytes, filename: str) -> str:
     suffix = os.path.splitext(filename)[-1] or ".mp4"
