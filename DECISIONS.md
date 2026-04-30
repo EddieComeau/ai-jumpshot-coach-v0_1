@@ -101,6 +101,7 @@ Must preserve:
 Decision:
 - `/analyze` exposes explicit analysis metadata: `analysis_mode`, `source`, `limitations`, and per-metric `confidence`
 - current values remain placeholder signals from `rules_placeholder`
+- future real pose/video extraction should plug into the analysis layer and preserve analysis ownership of measurement truth
 
 Why:
 - prepares the response contract for future real pose/video measurements without adding pose extraction now
@@ -111,3 +112,4 @@ Must preserve:
 - future real analysis should plug into `backend/app/analysis.py` and keep the response contract compatible where possible
 - rules may interpret returned metrics but must not invent measurements
 - chat may explain latest analysis and preferences but must not create unseen biomechanics data
+- frontend may present and group analysis results, but it must not create new metrics, confidence values, or analysis conclusions

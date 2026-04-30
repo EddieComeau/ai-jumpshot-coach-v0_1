@@ -345,7 +345,7 @@ Launch-readiness notes:
 `/analyze` currently returns:
 - `analysis_mode: "placeholder"`
 - `source: "rules_placeholder"`
-- `limitations` describing the current lack of pose extraction and validated biomechanics
+- `limitations` describing the current lack of pose extraction, placeholder confidence, and the boundary that future measurements belong in the analysis layer
 - placeholder metrics for `knee_bend_depth` and `drift`
 - per-metric `confidence`
 - up to 3 rules-engine fixes
@@ -356,7 +356,13 @@ The frontend presents the analysis as user-friendly cards and lists while keepin
 
 This is intentionally a lightweight MVP. Real pose extraction is not enabled yet.
 
-Future pose or video extraction should plug into the backend analysis layer and continue returning known metrics through `/analyze`. The rules layer may interpret metrics returned by analysis, but it must not invent measurements. Chat may explain the latest analysis and user preferences, but it must not become a hidden scoring or biomechanics layer.
+Contract boundary:
+- the analysis layer owns metrics and whatever is currently known from the uploaded video
+- the rules layer may interpret returned metrics, but it must not invent measurements
+- chat may explain the latest analysis and user preferences, but it must not become a hidden scoring or biomechanics layer
+- the frontend may present the payload clearly, but it must not create decision truth
+
+Future pose or video extraction should plug into the backend analysis layer and continue returning known metrics through `/analyze` where possible. Real measurement authority should not move into chat or frontend code.
 
 ## Current Constraints
 

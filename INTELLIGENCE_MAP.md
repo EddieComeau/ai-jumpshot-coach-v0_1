@@ -50,6 +50,7 @@ Responsibilities:
 - produce bounded placeholder metrics
 - mark the response contract with `analysis_mode`, `source`, `limitations`, and per-metric `confidence`
 - derive simple rules-engine fixes
+- preserve measurement authority inside the analysis layer so future real pose/video extraction plugs in here instead of moving into chat or frontend code
 
 Current limitations:
 - no pose extraction
@@ -99,4 +100,5 @@ Current authority boundaries must stay clear:
 - frontend is a presentation and input layer, not a source of decision truth
 - frontend can format status labels for readability, but backend analysis remains the data source
 - frontend can group chat text for readability, but must preserve backend response wording and meaning
+- frontend must not manufacture metrics, confidence, or analysis conclusions that are absent from `/analyze`
 - continuity docs describe system state but do not override code reality

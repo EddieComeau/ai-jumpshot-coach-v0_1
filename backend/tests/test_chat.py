@@ -10,6 +10,12 @@ def sample_analysis():
     return {
         "ok": True,
         "video_filename": "test-shot.mp4",
+        "analysis_mode": "placeholder",
+        "source": "rules_placeholder",
+        "limitations": [
+            "Pose extraction is not enabled in v0.1.",
+            "Metric values are deterministic placeholder signals, not validated biomechanics.",
+        ],
         "metrics": [
             {
                 "name": "knee_bend_depth",

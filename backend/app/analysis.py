@@ -9,6 +9,7 @@ ANALYSIS_LIMITATIONS = [
     "Pose extraction is not enabled in v0.1.",
     "Metric values are deterministic placeholder signals, not validated biomechanics.",
     "Rules may interpret returned metrics but must not create measurements that are absent from analysis.",
+    "Future real pose or video measurements should replace or extend analysis outputs in this layer, not in chat or frontend code.",
 ]
 
 
@@ -42,6 +43,14 @@ def compute_stub_metrics() -> List[Dict[str, Any]]:
             "notes": "Placeholder metric (pose extraction not enabled in v0.1).",
         },
     ]
+
+
+def analysis_contract_metadata() -> Dict[str, Any]:
+    return {
+        "analysis_mode": ANALYSIS_MODE,
+        "source": ANALYSIS_SOURCE,
+        "limitations": ANALYSIS_LIMITATIONS,
+    }
 
 
 def rules_engine(metrics: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[str]]:
@@ -89,9 +98,7 @@ def analyze_video_bytes(video_bytes: bytes, filename: str) -> Dict[str, Any]:
         return {
             "ok": True,
             "video_filename": filename,
-            "analysis_mode": ANALYSIS_MODE,
-            "source": ANALYSIS_SOURCE,
-            "limitations": ANALYSIS_LIMITATIONS,
+            **analysis_contract_metadata(),
             "metrics": metrics,
             "fixes": fixes,
             "notes": notes,
