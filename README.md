@@ -377,6 +377,30 @@ Future real-analysis integration plan:
 - if video quality is poor or some measurements cannot be extracted, analysis should still return a valid response and make limits explicit through `confidence`, metric `notes`, or top-level `limitations`
 - chat and rules must stay grounded in only the metrics present in the analysis payload
 
+First real metric plan:
+- candidate metrics reviewed:
+  - `knee_bend_depth`
+  - `drift`
+  - `release_angle`
+- recommended first metric: `knee_bend_depth`
+- why this metric first:
+  - it already exists in the contract
+  - it has immediate coaching value
+  - it can move from placeholder to real measurement without changing frontend expectations
+- contract shape remains the existing metric object:
+  - `name`
+  - `value`
+  - `units`
+  - `confidence`
+  - optional `notes`
+- transition rule:
+  - keep `knee_bend_depth` as the metric name
+  - replace the placeholder value with a measured value when real analysis exists
+  - preserve the same top-level `/analyze` response so rules, chat, and frontend stay compatible
+- failure handling:
+  - if knee bend cannot be measured reliably, return low confidence or surface the limitation explicitly
+  - do not invent a replacement value in rules, chat, or frontend code
+
 ## Current Constraints
 
 This repo does not currently include:

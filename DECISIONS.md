@@ -136,3 +136,20 @@ Must preserve:
 - existing top-level response fields should remain valid when real measurements are introduced
 - placeholder outputs should be replaceable by real metrics without moving authority into chat or frontend
 - missing or low-confidence measurements must not be silently inferred by downstream layers
+
+## D10: Start Real Measurement Work By Replacing An Existing Metric
+
+Decision:
+- the first real metric target should be `knee_bend_depth`
+- the system should prefer replacing the current placeholder version of an existing metric before adding a brand-new measurable concept
+
+Why:
+- preserves contract compatibility with the current frontend and rules layer
+- gives immediate coaching value with minimal architecture churn
+- reduces risk compared with introducing a new metric that would need new rules and new UI assumptions at the same time
+
+Must preserve:
+- `knee_bend_depth` should continue using the existing metric object shape: `name`, `value`, `units`, `confidence`, and optional `notes`
+- the placeholder-to-real transition should keep the metric name stable so frontend rendering and chat grounding remain compatible
+- rules may generate bounded fixes from the measured metric, but they must not convert it into a hidden score
+- if the metric cannot be measured reliably, analysis should return low confidence or explicit limitations instead of inventing a value

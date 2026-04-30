@@ -72,6 +72,27 @@ Future metric expansion model:
 - each metric should carry its own confidence and optional notes so partial or low-trust measurements stay explicit
 - if a metric cannot be measured for a clip, analysis should omit that metric or mark its limits in `notes`/`limitations` rather than letting downstream layers infer it
 
+First real metric candidates:
+- `knee_bend_depth`
+  - measures the dip/load angle already represented by the current placeholder metric
+  - high coaching value because it directly affects load, rhythm, and lift cues already present in the MVP
+  - lowest integration difficulty because it preserves the current metric name, units style, and rules entry point
+- `drift`
+  - measures forward body travel during the shot
+  - useful for balance and verticality coaching
+  - moderate difficulty because reliable tracking of body center movement usually depends on more stable multi-frame detection than the first metric should require
+- `release_angle`
+  - measures ball or forearm release geometry in degrees
+  - useful for arc and shot-shape discussion
+  - higher difficulty because it likely needs clearer release-frame detection and a stronger upper-body landmark signal before it is trustworthy
+
+Recommended first real metric:
+- `knee_bend_depth`
+  - best first step because it already exists in the contract, has immediate coaching value, and can transition from placeholder to real measurement without changing frontend expectations
+  - real integration path: keep the same metric object shape and replace the placeholder `value` + `confidence` with measured outputs from the future analysis pipeline
+  - rules impact: existing dip/load fixes can stay bounded to this metric without turning into a score; rules should keep generating narrow cues such as loading more smoothly or sitting into the hips more, not a composite grade
+  - failure handling: if knee bend cannot be measured confidently, return low confidence or omit the metric and surface the limitation rather than inventing a fallback value
+
 Partial-data handling plan:
 - poor video quality, occlusion, or short clips should still produce a valid `/analyze` response when possible
 - low-confidence or missing measurements should be surfaced through metric `confidence`, metric `notes`, and top-level `limitations`
