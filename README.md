@@ -398,8 +398,25 @@ First real metric plan:
   - replace the placeholder value with a measured value when real analysis exists
   - preserve the same top-level `/analyze` response so rules, chat, and frontend stay compatible
 - failure handling:
-  - if knee bend cannot be measured reliably, return low confidence or surface the limitation explicitly
+  - if knee bend cannot be measured reliably, keep returning the metric with low confidence and explicit notes or limitations
   - do not invent a replacement value in rules, chat, or frontend code
+
+Real knee bend integration boundary:
+- current placeholder location:
+  - `compute_stub_metrics()` creates the placeholder `knee_bend_depth` metric
+- future replacement location:
+  - the real measured `knee_bend_depth` should replace that placeholder inside the analysis layer before `rules_engine(metrics)` runs
+- conceptual pre-measurement boundary:
+  - uploaded video bytes may eventually be turned into frames, landmarks, or keypoints inside analysis
+  - those intermediate outputs are internal analysis inputs, not response fields
+- conceptual measurement function:
+  - `compute_knee_bend_depth(frames_or_keypoints) -> value, confidence, notes`
+- normalization rule:
+  - raw measurement should be converted into the existing degree-style metric representation before the metric object is returned
+  - confidence remains per-metric trust, not an overall shot score
+- swap rule:
+  - overwrite only `value`, `confidence`, and optional `notes`
+  - keep the rest of the `/analyze` response unchanged
 
 ## Current Constraints
 

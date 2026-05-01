@@ -33,6 +33,27 @@ def save_upload_to_temp(contents: bytes, filename: str) -> str:
 
 def compute_stub_metrics() -> List[Dict[str, Any]]:
     # Two MVP metrics: knee bend + drift (placeholder values)
+    # Future knee_bend_depth swap boundary:
+    # - Placeholder knee_bend_depth is created here today.
+    # - Real measurement should replace the knee_bend_depth metric object here,
+    #   after preprocessing / keypoint detection outputs are usable, and before
+    #   rules_engine(metrics) runs.
+    # - Do not move measurement authority into rules_engine(), chat, or frontend code.
+    #
+    # Conceptual boundary only, not implemented here:
+    # - preprocess_video(video_bytes or temp-path) -> frames_or_keypoints
+    # - compute_knee_bend_depth(frames_or_keypoints) -> value, confidence, notes
+    # - normalize_knee_bend_metric(value, confidence, notes) -> Metric-like dict
+    #
+    # Swap rule:
+    # - keep metric name `knee_bend_depth`
+    # - overwrite placeholder value, confidence, and optional notes only
+    # - keep the surrounding /analyze contract unchanged
+    #
+    # Failure rule:
+    # - if real measurement fails, keep returning the metric entry
+    # - use low confidence plus explanatory notes
+    # - do not invent a replacement value in downstream layers
     return [
         {
             "name": "knee_bend_depth",

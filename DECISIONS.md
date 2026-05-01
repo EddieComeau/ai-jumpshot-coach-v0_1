@@ -152,4 +152,21 @@ Must preserve:
 - `knee_bend_depth` should continue using the existing metric object shape: `name`, `value`, `units`, `confidence`, and optional `notes`
 - the placeholder-to-real transition should keep the metric name stable so frontend rendering and chat grounding remain compatible
 - rules may generate bounded fixes from the measured metric, but they must not convert it into a hidden score
-- if the metric cannot be measured reliably, analysis should return low confidence or explicit limitations instead of inventing a value
+- if the metric cannot be measured reliably, analysis should keep returning the metric with low confidence and explicit notes/limitations instead of inventing a value or removing the metric
+
+## D11: Real Knee Bend Should Replace Placeholder Inside Metric Creation
+
+Decision:
+- the real `knee_bend_depth` measurement should replace the placeholder at the metric-creation boundary inside `backend/app/analysis.py`
+- the swap must happen before `rules_engine(metrics)` interprets metrics and before the response is returned
+
+Why:
+- keeps measurement authority entirely inside the analysis layer
+- lets rules, chat, and frontend keep consuming the same contract without learning a new integration path
+- avoids leaking raw preprocessing outputs into non-analysis layers
+
+Must preserve:
+- preprocessing outputs such as frames, landmarks, or keypoints remain internal analysis-layer inputs, not public response fields
+- only `value`, `confidence`, and optional `notes` for `knee_bend_depth` should change during the placeholder-to-real swap
+- the rest of the `/analyze` response stays contract-compatible
+- if measurement fails, do not remove the metric and do not invent a substitute value downstream

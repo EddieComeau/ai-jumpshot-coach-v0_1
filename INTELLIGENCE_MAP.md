@@ -70,7 +70,7 @@ Future metric expansion model:
 - new metrics such as release angle, elbow alignment, or timing should be added as additional metric objects in the existing `metrics` list
 - placeholder metrics should be replaceable by real measurements, not removed as a concept from the contract
 - each metric should carry its own confidence and optional notes so partial or low-trust measurements stay explicit
-- if a metric cannot be measured for a clip, analysis should omit that metric or mark its limits in `notes`/`limitations` rather than letting downstream layers infer it
+- if a brand-new optional metric cannot be measured for a clip, analysis may omit it or mark its limits explicitly; for replacement metrics such as `knee_bend_depth`, keep the metric present and surface low confidence plus explanatory notes
 
 First real metric candidates:
 - `knee_bend_depth`
@@ -92,6 +92,45 @@ Recommended first real metric:
   - real integration path: keep the same metric object shape and replace the placeholder `value` + `confidence` with measured outputs from the future analysis pipeline
   - rules impact: existing dip/load fixes can stay bounded to this metric without turning into a score; rules should keep generating narrow cues such as loading more smoothly or sitting into the hips more, not a composite grade
   - failure handling: if knee bend cannot be measured confidently, return low confidence or omit the metric and surface the limitation rather than inventing a fallback value
+
+Real knee bend integration boundary:
+- current placeholder location: `compute_stub_metrics()` creates the `knee_bend_depth` metric object
+- future replacement location: the real measured `knee_bend_depth` should replace the placeholder metric inside the analysis layer before `rules_engine(metrics)` runs
+- do not replace the value earlier than the analysis layer’s usable preprocessing outputs
+- do not replace the value later in rules, chat, or frontend code
+
+Pre-measurement boundary:
+- uploaded video bytes enter `analyze_video_bytes()`
+- future preprocessing may conceptually produce frames, landmarks, or keypoints
+- those intermediate outputs are not metrics yet
+- the swap boundary begins only when preprocessing outputs are stable enough to support a measurement function
+
+Conceptual measurement boundary:
+- `compute_knee_bend_depth(frames_or_keypoints) -> value, confidence, notes`
+- conceptual inputs:
+  - preprocessed frame sequence or pose/keypoint data from the analysis layer
+- conceptual outputs:
+  - `value`: normalized knee bend measurement
+  - `confidence`: high-level trust estimate for that measurement
+  - `notes`: optional explanation when visibility, angle, or clip quality limits the reading
+
+Normalization boundary:
+- raw geometry should be converted into the existing contract units before the metric object is emitted
+- the normalized metric should continue using degree-style units consistent with the current placeholder representation
+- confidence should remain a bounded per-metric value that reflects measurement quality, not overall shot quality
+
+Placeholder-to-real swap rule:
+- placeholder logic remains the default until real measurement is available
+- when real measurement is available, only these `knee_bend_depth` fields change:
+  - `value`
+  - `confidence`
+  - optional `notes`
+- the rest of the `/analyze` response remains unchanged so frontend, rules, and chat stay compatible
+
+Integration-point failure handling:
+- if the measurement step fails, the metric should still be returned
+- use low confidence and explanatory notes instead of removing the metric
+- downstream layers must not invent substitute values
 
 Partial-data handling plan:
 - poor video quality, occlusion, or short clips should still produce a valid `/analyze` response when possible
