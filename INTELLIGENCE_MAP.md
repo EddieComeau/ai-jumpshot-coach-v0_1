@@ -106,9 +106,12 @@ Pre-measurement boundary:
 - the swap boundary begins only when preprocessing outputs are stable enough to support a measurement function
 
 Conceptual measurement boundary:
-- `compute_knee_bend_depth(frames_or_keypoints) -> value, confidence, notes`
+- `extract_frames(video_bytes or temp-path) -> frames`
+- `detect_keypoints(frames) -> keypoints`
+- `compute_knee_bend_depth(keypoints) -> value, confidence, notes`
 - conceptual inputs:
-  - preprocessed frame sequence or pose/keypoint data from the analysis layer
+  - extracted frames for detection
+  - pose/keypoint data for measurement
 - conceptual outputs:
   - `value`: normalized knee bend measurement
   - `confidence`: high-level trust estimate for that measurement
@@ -118,6 +121,16 @@ Normalization boundary:
 - raw geometry should be converted into the existing contract units before the metric object is emitted
 - the normalized metric should continue using degree-style units consistent with the current placeholder representation
 - confidence should remain a bounded per-metric value that reflects measurement quality, not overall shot quality
+
+Internal orchestration sketch:
+1. `analyze_video_bytes()` receives uploaded bytes and saves the temp file.
+2. `extract_frames(...)` conceptually prepares frame data.
+3. `detect_keypoints(...)` conceptually prepares body landmarks or keypoints.
+4. `compute_knee_bend_depth(...)` conceptually derives raw knee bend measurement outputs.
+5. `normalize_knee_bend_metric(...)` conceptually assembles the final contract-compatible metric object.
+6. analysis assembles the full `metrics` list.
+7. `rules_engine(metrics)` interprets the assembled metrics.
+8. the existing `/analyze` response is returned unchanged at the top level.
 
 Placeholder-to-real swap rule:
 - placeholder logic remains the default until real measurement is available
@@ -131,6 +144,19 @@ Integration-point failure handling:
 - if the measurement step fails, the metric should still be returned
 - use low confidence and explanatory notes instead of removing the metric
 - downstream layers must not invent substitute values
+
+Fallback layering:
+- if frame extraction, keypoint detection, or knee bend measurement is unavailable, analysis should fall back inside the analysis layer before metrics are handed to `rules_engine(metrics)`
+- fallback should return the current placeholder `knee_bend_depth` metric rather than forcing downstream layers to branch
+- this keeps runtime behavior stable while allowing future real-measurement stages to be introduced incrementally
+
+Extensibility pattern:
+- future metrics such as `release_angle` should follow the same pattern:
+  - reuse shared preprocessing helpers such as frame extraction and keypoint detection
+  - add a metric-specific compute helper
+  - normalize into the existing metric object structure
+  - assemble into the same `metrics` list before rules interpretation
+- this keeps measurement logic isolated per metric while sharing upstream analysis-layer stages
 
 Partial-data handling plan:
 - poor video quality, occlusion, or short clips should still produce a valid `/analyze` response when possible

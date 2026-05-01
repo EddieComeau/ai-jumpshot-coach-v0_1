@@ -170,3 +170,24 @@ Must preserve:
 - only `value`, `confidence`, and optional `notes` for `knee_bend_depth` should change during the placeholder-to-real swap
 - the rest of the `/analyze` response stays contract-compatible
 - if measurement fails, do not remove the metric and do not invent a substitute value downstream
+
+## D12: Real Measurement Helpers Should Be Layered And Isolated
+
+Decision:
+- future real measurement work inside `backend/app/analysis.py` should be decomposed into staged internal helpers
+- for knee bend, the conceptual helper flow is:
+  - `extract_frames(...)`
+  - `detect_keypoints(...)`
+  - `compute_knee_bend_depth(...)`
+  - `normalize_knee_bend_metric(...)`
+
+Why:
+- keeps measurement logic isolated from rules interpretation
+- makes placeholder fallback straightforward at the analysis-layer orchestration point
+- creates a repeatable pattern for future metrics without changing the public contract
+
+Must preserve:
+- orchestration stays inside the analysis layer
+- placeholder fallback happens before `rules_engine(metrics)` runs
+- normalization must emit the existing metric shape so frontend changes are not required
+- future metrics may reuse upstream preprocessing helpers, but each metric’s measurement logic should remain isolated

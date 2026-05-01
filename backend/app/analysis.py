@@ -22,6 +22,28 @@ ANALYSIS_LIMITATIONS = [
 #   3. extract measurements
 #   4. normalize measurements into metric objects
 #   5. return the existing analysis contract for rules + chat consumption
+#
+# Future internal helper sketch for real knee bend, conceptual only:
+# - extract_frames(video_bytes or temp-path) -> frames
+# - detect_keypoints(frames) -> keypoints
+# - compute_knee_bend_depth(keypoints) -> value, confidence, notes
+# - normalize_knee_bend_metric(value, confidence, notes) -> Metric-like dict
+#
+# Future orchestration order, conceptual only:
+# 1. save uploaded video
+# 2. attempt frame extraction
+# 3. attempt keypoint detection
+# 4. attempt knee bend measurement
+# 5. normalize measured output into the existing metric contract
+# 6. assemble metrics list
+# 7. run rules_engine(metrics)
+# 8. return the existing /analyze response shape
+#
+# Fallback layering:
+# - if any real-measurement stage is unavailable or unreliable, keep using the
+#   placeholder metric path for knee_bend_depth
+# - fallback should happen inside analysis-layer metric assembly so rules, chat,
+#   and frontend continue receiving a valid contract without special cases
 
 def save_upload_to_temp(contents: bytes, filename: str) -> str:
     suffix = os.path.splitext(filename)[-1] or ".mp4"
@@ -41,8 +63,9 @@ def compute_stub_metrics() -> List[Dict[str, Any]]:
     # - Do not move measurement authority into rules_engine(), chat, or frontend code.
     #
     # Conceptual boundary only, not implemented here:
-    # - preprocess_video(video_bytes or temp-path) -> frames_or_keypoints
-    # - compute_knee_bend_depth(frames_or_keypoints) -> value, confidence, notes
+    # - extract_frames(video_bytes or temp-path) -> frames
+    # - detect_keypoints(frames) -> keypoints
+    # - compute_knee_bend_depth(keypoints) -> value, confidence, notes
     # - normalize_knee_bend_metric(value, confidence, notes) -> Metric-like dict
     #
     # Swap rule:
