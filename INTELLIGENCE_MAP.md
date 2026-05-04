@@ -158,6 +158,38 @@ Extensibility pattern:
   - assemble into the same `metrics` list before rules interpretation
 - this keeps measurement logic isolated per metric while sharing upstream analysis-layer stages
 
+Implementation-readiness checklist for first real knee bend work:
+- metric scope is limited to `knee_bend_depth` only
+- no additional metrics are introduced in the same implementation slice
+- no scoring, aggregation, persistence, or frontend changes are bundled into the measurement slice
+- placeholder fallback remains functional before any real measurement code is attempted
+- the implementation keeps the existing `/analyze` top-level response contract intact
+- only `value`, `confidence`, and optional `notes` for `knee_bend_depth` are eligible to change
+
+Dependency constraints for first implementation:
+- allow only the minimum analysis-layer dependencies needed to attempt a single-metric measurement path
+- avoid introducing multiple heavy CV frameworks in the first slice
+- do not introduce full-body modeling, temporal modeling stacks, or optimization toolchains in the first slice
+- any dependency choice must preserve a clean fallback path to placeholder analysis
+
+Implementation scope limits:
+- one metric only: `knee_bend_depth`
+- one measurement output path: `value` plus `confidence`, with optional explanatory notes
+- no advanced smoothing, no multi-shot aggregation, no hidden composite scoring, and no performance-optimization phase yet
+- no changes to rules structure beyond consuming the existing metric name as they already do
+
+Fallback guarantees:
+- placeholder `knee_bend_depth` path must remain runnable even if real measurement code is unavailable or fails
+- real-measurement failure must fall back inside the analysis layer before rules interpretation
+- the system must continue returning a valid `knee_bend_depth` metric entry instead of a missing or malformed payload
+
+Implementation stop conditions:
+- stop if the implementation starts requiring multiple heavy dependencies
+- stop if the measurement path becomes unstable across repeated runs
+- stop if analysis-layer boundaries are at risk of leaking measurement logic into rules, chat, or frontend code
+- stop if the implementation requires API contract changes or frontend changes to stay functional
+- stop if fallback can no longer guarantee a valid metric response
+
 Partial-data handling plan:
 - poor video quality, occlusion, or short clips should still produce a valid `/analyze` response when possible
 - low-confidence or missing measurements should be surfaced through metric `confidence`, metric `notes`, and top-level `limitations`

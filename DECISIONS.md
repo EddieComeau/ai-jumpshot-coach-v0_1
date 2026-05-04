@@ -191,3 +191,20 @@ Must preserve:
 - placeholder fallback happens before `rules_engine(metrics)` runs
 - normalization must emit the existing metric shape so frontend changes are not required
 - future metrics may reuse upstream preprocessing helpers, but each metric’s measurement logic should remain isolated
+
+## D13: Real Knee Bend Implementation Must Clear A Readiness Gate
+
+Decision:
+- no real knee bend implementation should begin until a strict readiness checklist is satisfied
+- the first implementation slice must stay limited to one metric, one analysis-layer measurement path, and one fallback-safe contract
+
+Why:
+- reduces the risk of planning drift turning into a broad CV expansion
+- preserves the current MVP contract and fallback behavior while first measurement work is still uncertain
+- creates an explicit stop line if dependency or architecture complexity grows too quickly
+
+Must preserve:
+- first implementation scope is `knee_bend_depth` only
+- no scoring, persistence, multi-metric rollout, frontend changes, or contract changes are bundled into that first slice
+- placeholder fallback remains fully functional
+- if dependencies, instability, or architecture drift grow beyond the readiness limits, implementation should stop and return to planning

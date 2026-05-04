@@ -418,6 +418,26 @@ Real knee bend integration boundary:
   - overwrite only `value`, `confidence`, and optional `notes`
   - keep the rest of the `/analyze` response unchanged
 
+Implementation-readiness checklist before any real knee bend code:
+- metric target must remain `knee_bend_depth` only
+- no additional metrics should be bundled into the first implementation slice
+- no scoring, persistence, frontend changes, or API contract changes should be bundled into that slice
+- placeholder fallback must remain functional throughout the implementation effort
+- first implementation should be limited to extracting `value` and `confidence`, with optional explanatory notes
+- advanced smoothing, temporal modeling, multi-shot aggregation, and performance optimization are out of scope for the first slice
+
+Dependency constraints:
+- use only the minimum analysis-layer dependencies required for a single-metric measurement attempt
+- do not introduce multiple heavy CV frameworks in the first implementation slice
+- do not introduce full-body modeling or broad intelligence layers yet
+
+Implementation stop conditions:
+- stop if dependency complexity grows beyond a minimal single-slice implementation
+- stop if the measurement path becomes unstable across runs
+- stop if analysis-layer boundaries begin leaking into rules, chat, or frontend
+- stop if fallback can no longer guarantee a valid `knee_bend_depth` metric response
+- stop if the implementation requires contract or frontend changes to stay functional
+
 ## Current Constraints
 
 This repo does not currently include:
