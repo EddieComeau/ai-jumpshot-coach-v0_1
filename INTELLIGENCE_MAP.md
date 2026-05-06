@@ -47,16 +47,16 @@ Location:
 
 Responsibilities:
 - manage uploaded video bytes
-- produce bounded placeholder metrics
+- produce bounded metrics with placeholder fallback
 - mark the response contract with `analysis_mode`, `source`, `limitations`, and per-metric `confidence`
 - derive simple rules-engine fixes
 - preserve measurement authority inside the analysis layer so future real pose/video extraction plugs in here instead of moving into chat or frontend code
 
 Current limitations:
-- no pose extraction
+- no production-ready pose extraction
 - no frame-level analysis
 - no persisted artifacts
-- current metric values are deterministic placeholders, not validated biomechanics
+- `drift` remains a deterministic placeholder and `knee_bend_depth` remains an experimental single-metric spike with placeholder fallback
 
 Future real-analysis interface plan:
 - input boundary: uploaded video bytes continue entering through `POST /analyze` and are handed to `backend/app/analysis.py`
@@ -213,7 +213,7 @@ Responsibilities:
 1. User selects a local video in the desktop UI.
 2. Frontend posts multipart form data to `POST /analyze`.
 3. Backend writes the upload to a temp file.
-4. Backend generates placeholder metrics.
+4. Backend assembles metrics, attempting experimental `knee_bend_depth` extraction before falling back to placeholders.
 5. Rules engine derives up to 3 fixes plus notes.
 6. Backend returns the response and removes the temp file.
 7. Frontend presents the existing response as metric cards, top fixes, notes, and a placeholder disclaimer.

@@ -346,7 +346,8 @@ Launch-readiness notes:
 - `analysis_mode: "placeholder"`
 - `source: "rules_placeholder"`
 - `limitations` describing the current lack of pose extraction, placeholder confidence, and the boundary that future measurements belong in the analysis layer
-- placeholder metrics for `knee_bend_depth` and `drift`
+- an experimental real-measurement attempt for `knee_bend_depth`, with placeholder fallback when extraction is unavailable or unreliable
+- a placeholder metric for `drift`
 - per-metric `confidence`
 - up to 3 rules-engine fixes
 - notes
@@ -354,7 +355,7 @@ Launch-readiness notes:
 
 The frontend presents the analysis as user-friendly cards and lists while keeping the placeholder status visible.
 
-This is intentionally a lightweight MVP. Real pose extraction is not enabled yet.
+This is intentionally a lightweight MVP. Production-ready pose extraction is not enabled yet.
 
 Contract boundary:
 - the analysis layer owns metrics and whatever is currently known from the uploaded video
