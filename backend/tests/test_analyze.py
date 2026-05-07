@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from fastapi.testclient import TestClient
 
+from app.analysis import rules_engine
 from app.main import app
 
 
@@ -97,3 +98,40 @@ def test_analyze_can_force_placeholder_fallback(monkeypatch):
     assert data["debug"]["pose_enabled"] is False
     assert "Forced placeholder mode" in data["debug"]["fallback_reason"]
     assert knee_metric["notes"] == "Placeholder metric (pose extraction not enabled in v0.1)."
+
+
+def test_rules_engine_softens_knee_fix_when_confidence_is_limited():
+    fixes, notes = rules_engine(
+        [
+            {
+                "name": "knee_bend_depth",
+                "value": 38.0,
+                "units": "deg (approx knee angle at dip)",
+                "confidence": 0.35,
+                "notes": "Placeholder metric (pose extraction not enabled in v0.1).",
+            }
+        ]
+    )
+
+    assert fixes
+    assert fixes[0]["issue"] == "Possible shallow dip / limited load"
+    assert "limited confidence" in fixes[0]["evidence"]
+    assert notes[-1] == "Positive: run completed with consistent metric output shape."
+
+
+def test_rules_engine_keeps_bounded_fix_when_confidence_is_strong():
+    fixes, _ = rules_engine(
+        [
+            {
+                "name": "knee_bend_depth",
+                "value": 38.0,
+                "units": "deg (estimated knee flexion at dip)",
+                "confidence": 0.82,
+                "notes": "Measured from experimental single-leg landmarks.",
+            }
+        ]
+    )
+
+    assert fixes
+    assert fixes[0]["issue"] == "Shallow dip / limited load"
+    assert "below target load range" in fixes[0]["evidence"]

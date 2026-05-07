@@ -365,6 +365,13 @@ Contract boundary:
 
 Future pose or video extraction should plug into the backend analysis layer and continue returning known metrics through `/analyze` where possible. Real measurement authority should not move into chat or frontend code.
 
+Rules interpretation boundary for `knee_bend_depth`:
+- rules may keep using simple threshold-based interpretation for this metric
+- confidence is treated as interpretation trust, not a score
+- low-confidence or placeholder-like readings should produce softer coaching language
+- stronger-confidence readings may use the normal bounded cue style
+- rules must not infer unseen biomechanics, grading, or weighted player evaluation from this metric
+
 Future real-analysis integration plan:
 - video continues entering through `POST /analyze`
 - future frame extraction or detection should happen inside the analysis layer before metrics are returned

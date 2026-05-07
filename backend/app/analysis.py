@@ -53,6 +53,8 @@ ANALYSIS_LIMITATIONS = [
 #   and frontend continue receiving a valid contract without special cases
 REAL_KNEE_BEND_CONFIDENCE_THRESHOLD = 0.55
 REAL_KNEE_BEND_FRAME_LIMIT = 6
+RULES_CONFIDENCE_CAUTION_THRESHOLD = 0.55
+RULES_CONFIDENCE_STRONG_THRESHOLD = 0.75
 
 
 def save_upload_to_temp(contents: bytes, filename: str) -> str:
@@ -293,6 +295,68 @@ def analysis_contract_metadata() -> Dict[str, Any]:
     }
 
 
+def metric_confidence_band(metric: Dict[str, Any]) -> str:
+    confidence = float(metric.get("confidence") or 0.0)
+    if confidence >= RULES_CONFIDENCE_STRONG_THRESHOLD:
+        return "strong"
+    if confidence >= RULES_CONFIDENCE_CAUTION_THRESHOLD:
+        return "cautious"
+    return "limited"
+
+
+def metric_is_placeholder_like(metric: Dict[str, Any]) -> bool:
+    notes = (metric.get("notes") or "").lower()
+    return "placeholder" in notes or "fallback" in notes
+
+
+def build_knee_fix(knee: Dict[str, Any]) -> Dict[str, str]:
+    confidence_band = metric_confidence_band(knee)
+    placeholder_like = metric_is_placeholder_like(knee)
+    issue = "Shallow dip / limited load"
+    evidence = f"knee_bend_depth ~= {knee['value']} (below target load range)"
+    cue = "Sit into your hips a bit more with smooth tempo."
+
+    if confidence_band == "limited" or placeholder_like:
+        issue = "Possible shallow dip / limited load"
+        evidence = f"Early signal: knee_bend_depth ~= {knee['value']} with limited confidence."
+        cue = "If this matches what you feel on video, try a slightly smoother hip load before rising."
+    elif confidence_band == "cautious":
+        issue = "Likely shallow dip / limited load"
+        evidence = f"knee_bend_depth ~= {knee['value']} suggests a shallow load, but confidence is still moderate."
+        cue = "Try sitting into your hips a bit more, then confirm the change against the video."
+
+    return {
+        "issue": issue,
+        "evidence": evidence,
+        "cue": cue,
+        "drill": "Wall dip reps: 3x8 slow dips, 1s hold, rise.",
+    }
+
+
+def build_drift_fix(drift: Dict[str, Any]) -> Dict[str, str]:
+    confidence_band = metric_confidence_band(drift)
+    placeholder_like = metric_is_placeholder_like(drift)
+    issue = "Forward drift"
+    evidence = f"drift ~= {drift['value']} body widths forward"
+    cue = "Think up, not out; finish tall and stacked."
+
+    if confidence_band == "limited" or placeholder_like:
+        issue = "Possible forward drift"
+        evidence = f"Early signal: drift ~= {drift['value']} body widths forward with limited confidence."
+        cue = "If the clip also looks like you are moving forward, focus on finishing taller and more vertical."
+    elif confidence_band == "cautious":
+        issue = "Likely forward drift"
+        evidence = f"drift ~= {drift['value']} body widths forward suggests forward movement, but confidence is still moderate."
+        cue = "Think up before out, then confirm that your finish still looks stacked on video."
+
+    return {
+        "issue": issue,
+        "evidence": evidence,
+        "cue": cue,
+        "drill": "Tape-line jumps: land on/behind line, 5x5 makes.",
+    }
+
+
 def rules_engine(metrics: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[str]]:
     knee = next((m for m in metrics if m["name"] == "knee_bend_depth"), None)
     drift = next((m for m in metrics if m["name"] == "drift"), None)
@@ -302,29 +366,25 @@ def rules_engine(metrics: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], L
 
     if knee:
         if knee["value"] < 45:
-            fixes.append(
-                {
-                    "issue": "Shallow dip / limited load",
-                    "evidence": f"knee_bend_depth ~= {knee['value']} (below target load range)",
-                    "cue": "Sit into your hips a bit more with smooth tempo.",
-                    "drill": "Wall dip reps: 3x8 slow dips, 1s hold, rise.",
-                }
-            )
+            fixes.append(build_knee_fix(knee))
         else:
-            notes.append("Knee bend appears adequate (from current metric).")
+            if metric_confidence_band(knee) == "limited" or metric_is_placeholder_like(knee):
+                notes.append("Knee bend may be adequate, but this read is still limited-confidence.")
+            elif metric_confidence_band(knee) == "cautious":
+                notes.append("Knee bend appears adequate, though this read is still moderate-confidence.")
+            else:
+                notes.append("Knee bend appears adequate (from current metric).")
 
     if drift:
         if drift["value"] > 0.18:
-            fixes.append(
-                {
-                    "issue": "Forward drift",
-                    "evidence": f"drift ~= {drift['value']} body widths forward",
-                    "cue": "Think up, not out; finish tall and stacked.",
-                    "drill": "Tape-line jumps: land on/behind line, 5x5 makes.",
-                }
-            )
+            fixes.append(build_drift_fix(drift))
         else:
-            notes.append("Drift appears controlled (from current metric).")
+            if metric_confidence_band(drift) == "limited" or metric_is_placeholder_like(drift):
+                notes.append("Drift may be controlled, but this read is still limited-confidence.")
+            elif metric_confidence_band(drift) == "cautious":
+                notes.append("Drift appears controlled, though this read is still moderate-confidence.")
+            else:
+                notes.append("Drift appears controlled (from current metric).")
 
     notes.append("Positive: run completed with consistent metric output shape.")
     return fixes[:3], notes

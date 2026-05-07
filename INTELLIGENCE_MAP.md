@@ -195,6 +195,14 @@ Partial-data handling plan:
 - low-confidence or missing measurements should be surfaced through metric `confidence`, metric `notes`, and top-level `limitations`
 - chat and rules must stay grounded in only the metrics that actually appear in analysis output
 
+Rules interpretation boundary for real knee bend:
+- rules may continue using simple threshold-based interpretation for `knee_bend_depth`
+- confidence is a trust signal, not a score
+- low-confidence or placeholder-like knee bend values should soften wording and avoid strong certainty
+- stronger-confidence knee bend values may use the existing bounded cue style
+- rules must not infer additional unseen biomechanics from one knee bend reading
+- rules must not convert confidence into grading, ranking, or weighted player evaluation
+
 ### Coaching Layer
 
 Location:

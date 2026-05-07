@@ -208,3 +208,21 @@ Must preserve:
 - no scoring, persistence, multi-metric rollout, frontend changes, or contract changes are bundled into that first slice
 - placeholder fallback remains fully functional
 - if dependencies, instability, or architecture drift grow beyond the readiness limits, implementation should stop and return to planning
+
+## D14: Rules Should Treat Confidence As Interpretation Trust, Not Scoring
+
+Decision:
+- the rules layer may use `confidence` to soften or strengthen wording around `knee_bend_depth`
+- low-confidence or placeholder-like readings should produce more cautious coaching language
+- confidence must not become a hidden score, grade, or weighted player evaluation signal
+
+Why:
+- keeps coaching honest when the analysis path is experimental or fallback-driven
+- preserves deterministic and explainable rules behavior
+- prevents architecture drift from simple metric interpretation into hidden intelligence
+
+Must preserve:
+- rules still interpret only returned metrics
+- confidence changes coaching certainty, not the public contract shape
+- fallback or placeholder readings must avoid fake precision
+- stronger-confidence readings may still use the same bounded fixes without introducing grading systems
